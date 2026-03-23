@@ -19,26 +19,11 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 ### Option 1: Install from source
 
 ```bash
-git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && pip install /tmp/pf-skills/mcp-server && python -m portframe_mcp.install && rm -rf /tmp/pf-skills
+git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
 
 This installs the MCP server and auto-configures it for any detected IDEs (Cursor, Claude Code, Windsurf, VS Code).
 
-### Option 2: Manual skill install (no MCP)
-
-If you prefer the skill-only approach (uses curl instead of MCP):
-
-**Claude Code** (Mac / Linux)
-```bash
-rm -rf /tmp/pf-skills ~/.claude/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && cp -r /tmp/pf-skills/skills/portframe ~/.claude/skills/portframe && rm -rf /tmp/pf-skills
-```
-
-**Cursor** (Mac / Linux)
-```bash
-rm -rf /tmp/pf-skills ~/.cursor/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.cursor/skills && cp -r /tmp/pf-skills/skills/portframe ~/.cursor/skills/portframe && rm -rf /tmp/pf-skills
-```
-
-> **Note:** The skill-only install uses curl for API calls, which may be blocked by Cursor's sandbox. The MCP install (Option 1) avoids this issue entirely.
 
 ## Getting Started
 

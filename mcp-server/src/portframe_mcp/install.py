@@ -5,7 +5,7 @@ Detects installed IDEs and registers the PortFrame MCP server
 in each one's configuration. Merges into existing configs without
 overwriting other MCP servers.
 
-Run: python -m portframe_mcp.install
+Run: python3 -m portframe_mcp.install
 """
 import json
 import shutil
@@ -28,14 +28,13 @@ def _has_claude_cli() -> bool:
 
 def _mcp_server_entry(use_uvx: bool) -> dict:
     if use_uvx:
-        return {"command": "uvx", "args": ["portframe-mcp"]}
+        uvx_path = shutil.which("uvx")
+        return {"command": uvx_path, "args": ["portframe-mcp"]}
 
-    python_path = sys.executable
-    return {"command": python_path, "args": ["-m", "portframe_mcp"]}
+    return {"command": sys.executable, "args": ["-m", "portframe_mcp"]}
 
 
 def _merge_mcp_config(config_path: Path, root_key: str, server_entry: dict) -> bool:
-    """Merge portframe server into an mcp.json file. Returns True if changed."""
     data = {}
     if config_path.exists():
         try:
@@ -53,13 +52,22 @@ def _merge_mcp_config(config_path: Path, root_key: str, server_entry: dict) -> b
 
 
 def _setup_cursor(server_entry: dict) -> bool:
-    config_path = Path.home() / ".cursor" / "mcp.json"
-    if not (Path.home() / ".cursor").exists():
+    cursor_dir = Path.home() / ".cursor"
+    if not cursor_dir.exists():
         return False
 
     log("Cursor detected")
-    _merge_mcp_config(config_path, "mcpServers", server_entry)
-    log(f"  Configured: {config_path}")
+
+    global_config = cursor_dir / "mcp.json"
+    _merge_mcp_config(global_config, "mcpServers", server_entry)
+    log(f"  Global config: {global_config}")
+
+    cwd_cursor = Path.cwd() / ".cursor"
+    if cwd_cursor.exists():
+        project_config = cwd_cursor / "mcp.json"
+        _merge_mcp_config(project_config, "mcpServers", server_entry)
+        log(f"  Project config: {project_config}")
+
     return True
 
 
@@ -68,13 +76,14 @@ def _setup_claude_code(server_entry: dict, use_uvx: bool) -> bool:
         log("Claude Code detected (CLI available)")
         try:
             if use_uvx:
+                uvx_path = shutil.which("uvx")
                 cmd = [
                     "claude", "mcp", "add",
                     "--transport", "stdio",
                     "--scope", "user",
                     "portframe",
                     "--",
-                    "uvx", "portframe-mcp",
+                    uvx_path, "portframe-mcp",
                 ]
             else:
                 cmd = [
@@ -133,13 +142,11 @@ def install() -> None:
     log()
 
     use_uvx = _has_uvx()
-    if use_uvx:
-        log(f"uvx found: will use 'uvx portframe-mcp'")
-    else:
-        log(f"uvx not found: will use '{sys.executable} -m portframe_mcp'")
+    server_entry = _mcp_server_entry(use_uvx)
+
+    log(f"MCP command: {server_entry['command']} {' '.join(server_entry['args'])}")
     log()
 
-    server_entry = _mcp_server_entry(use_uvx)
     configured = []
 
     if _setup_cursor(server_entry):
@@ -168,9 +175,14 @@ def install() -> None:
     log()
 
     sessions_file = Path.home() / ".portframe" / "sessions.json"
-    if not sessions_file.exists() or not json.loads(sessions_file.read_text()).get("api_token"):
+    try:
+        has_token = sessions_file.exists() and json.loads(sessions_file.read_text()).get("api_token")
+    except (json.JSONDecodeError, IOError):
+        has_token = False
+
+    if not has_token:
         log("Note: You haven't authenticated yet.")
-        log("  Run: python3 -m portframe_mcp.auth")
+        log(f"  Run: {sys.executable} -m portframe_mcp.auth")
         log("  (The agent will also prompt you on first use)")
     log()
 
