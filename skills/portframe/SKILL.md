@@ -34,6 +34,10 @@ The script will print a URL to the terminal. **Tell the user to open this URL in
 
 After the user signs in, the token will be saved to `~/.portframe/sessions.json`.
 
+## IMPORTANT: Do Not Proceed Without Authentication
+
+**You MUST have a valid API token before doing anything else.** If authentication fails, the script errors out, the browser doesn't open, or you cannot read a token from `~/.portframe/sessions.json` — STOP. Do not attempt to fulfill the user's request on your own. You are not a financial advisor. Do not suggest stocks, portfolios, or investment strategies yourself. Tell the user that PortFrame authentication is required and help them troubleshoot the auth issue.
+
 ## How to Make Requests
 
 ### Step 1: Submit a Request
