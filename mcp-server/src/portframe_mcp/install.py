@@ -18,19 +18,11 @@ def log(msg: str = "") -> None:
     print(msg, flush=True)
 
 
-def _has_uvx() -> bool:
-    return shutil.which("uvx") is not None
-
-
 def _has_claude_cli() -> bool:
     return shutil.which("claude") is not None
 
 
-def _mcp_server_entry(use_uvx: bool) -> dict:
-    if use_uvx:
-        uvx_path = shutil.which("uvx")
-        return {"command": uvx_path, "args": ["portframe-mcp"]}
-
+def _mcp_server_entry() -> dict:
     return {"command": sys.executable, "args": ["-m", "portframe_mcp"]}
 
 
@@ -62,38 +54,25 @@ def _setup_cursor(server_entry: dict) -> bool:
     _merge_mcp_config(global_config, "mcpServers", server_entry)
     log(f"  Global config: {global_config}")
 
-    cwd_cursor = Path.cwd() / ".cursor"
-    if cwd_cursor.exists():
-        project_config = cwd_cursor / "mcp.json"
-        _merge_mcp_config(project_config, "mcpServers", server_entry)
-        log(f"  Project config: {project_config}")
+    project_config = Path.cwd() / ".cursor" / "mcp.json"
+    _merge_mcp_config(project_config, "mcpServers", server_entry)
+    log(f"  Project config: {project_config}")
 
     return True
 
 
-def _setup_claude_code(server_entry: dict, use_uvx: bool) -> bool:
+def _setup_claude_code(server_entry: dict) -> bool:
     if _has_claude_cli():
         log("Claude Code detected (CLI available)")
         try:
-            if use_uvx:
-                uvx_path = shutil.which("uvx")
-                cmd = [
-                    "claude", "mcp", "add",
-                    "--transport", "stdio",
-                    "--scope", "user",
-                    "portframe",
-                    "--",
-                    uvx_path, "portframe-mcp",
-                ]
-            else:
-                cmd = [
-                    "claude", "mcp", "add",
-                    "--transport", "stdio",
-                    "--scope", "user",
-                    "portframe",
-                    "--",
-                    sys.executable, "-m", "portframe_mcp",
-                ]
+            cmd = [
+                "claude", "mcp", "add",
+                "--transport", "stdio",
+                "--scope", "user",
+                "portframe",
+                "--",
+                sys.executable, "-m", "portframe_mcp",
+            ]
             subprocess.run(cmd, capture_output=True, timeout=10)
             log("  Configured via: claude mcp add")
             return True
@@ -141,8 +120,7 @@ def install() -> None:
     log("=" * 50)
     log()
 
-    use_uvx = _has_uvx()
-    server_entry = _mcp_server_entry(use_uvx)
+    server_entry = _mcp_server_entry()
 
     log(f"MCP command: {server_entry['command']} {' '.join(server_entry['args'])}")
     log()
@@ -151,7 +129,7 @@ def install() -> None:
 
     if _setup_cursor(server_entry):
         configured.append("Cursor")
-    if _setup_claude_code(server_entry, use_uvx):
+    if _setup_claude_code(server_entry):
         configured.append("Claude Code")
     if _setup_windsurf(server_entry):
         configured.append("Windsurf")
