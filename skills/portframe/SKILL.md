@@ -24,13 +24,15 @@ Read `~/.portframe/sessions.json` and look for the `api_token` field.
 
 **If no token exists, authenticate:**
 
-Run the authentication script to open a browser and generate a token. The script is located in the `scripts/` directory next to this SKILL.md file:
+Run the authentication script. It starts a local server and tries to open a browser:
 
 ```bash
 python3 scripts/auth.py
 ```
 
-After authentication completes, the token will be saved to `~/.portframe/sessions.json`.
+The script will print a URL to the terminal. **Tell the user to open this URL in their browser if it doesn't open automatically.** The URL looks like: `https://pro.portframe.com/skill-signup?callback=...`
+
+After the user signs in, the token will be saved to `~/.portframe/sessions.json`.
 
 ## How to Make Requests
 
