@@ -16,10 +16,10 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 
 **Requires:** Python 3.10+
 
-### Option 1: pip install (recommended)
+### Option 1: Install from source
 
 ```bash
-pip install portframe-mcp && python -m portframe_mcp.install
+git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && pip install /tmp/pf-skills/mcp-server && python -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
 
 This installs the MCP server and auto-configures it for any detected IDEs (Cursor, Claude Code, Windsurf, VS Code).
