@@ -1,0 +1,14 @@
+{
+  "name": "portframe-skills",
+  "version": "1.0.0",
+  "description": "PortFrame AI portfolio management skills for Claude Code and compatible AI agents",
+  "author": {
+    "name": "MGi Strategies",
+    "url": "https://portframe.com"
+  },
+  "homepage": "https://portframe.com",
+  "repository": "https://github.com/MGi-Strategies/portframe-skills",
+  "license": "MIT",
+  "keywords": ["portfolio", "finance", "investing", "backtest", "analysis", "portframe"],
+  "skills": "./skills"
+}

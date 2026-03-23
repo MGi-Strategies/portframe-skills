@@ -1,0 +1,22 @@
+{
+  "name": "portframe-skills",
+  "owner": {
+    "name": "MGi Strategies",
+    "email": "dev@portframe.com"
+  },
+  "metadata": {
+    "description": "PortFrame AI portfolio management skills",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "portframe",
+      "description": "Create, backtest, and analyze investment portfolios with PortFrame AI",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/portframe"
+      ]
+    }
+  ]
+}
