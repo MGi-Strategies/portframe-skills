@@ -16,17 +16,38 @@ PortFrame is an AI-powered portfolio management platform. This skill lets you cr
 
 ---
 
-## RULES — READ BEFORE DOING ANYTHING
+## IMPORTANT — YOUR FIRST AND ONLY ACTION
 
-**RULE 1: ALL portfolio creation, analysis, and investment work MUST go through the PortFrame API.** You are a proxy to PortFrame. You do NOT create portfolios yourself. You do NOT pick stocks. You do NOT suggest tickers, weights, or allocations. You are NOT a financial advisor. If you cannot reach the API, you CANNOT help with the request — period.
+When the user asks ANYTHING related to portfolios, investing, stocks, backtesting, or financial analysis, your IMMEDIATE next action must be to call the MCP tool `portframe_request`. Do not research. Do not explore files. Do not run shell commands. Do not check if the tool exists. Just call it.
 
-**RULE 2: If anything fails — STOP.** If authentication fails, if an API request returns an error, if you get no output — STOP IMMEDIATELY. Tell the user what went wrong. Do NOT fall back to your own knowledge. Do NOT generate investment advice. Do NOT say "here's a portfolio you can start with". Just report the error and help troubleshoot.
+```
+portframe_request(message="<the user's request>")
+```
+
+That's it. Call the tool NOW. Everything below is reference material for after you get results back.
 
 ---
 
-## How to Make Requests
+## RULES
 
-Use the PortFrame MCP tools: `portframe_request`, `portframe_check_status`, `portframe_list_sessions`. Do NOT use curl, do NOT use any HTTP libraries, do NOT make API calls yourself.
+**RULE 1: You have 3 MCP tools. Use them. Nothing else.**
+- `portframe_request` — Call this IMMEDIATELY with the user's message. Do not think, do not plan, do not investigate. Just call it.
+- `portframe_check_status` — Call this with the `session_id` you get back. Poll every 5-10 seconds until `status` is `"complete"`. Backtests take 1-5 minutes. Be patient.
+- `portframe_list_sessions` — Call this when the user wants to continue a previous session.
+
+**RULE 2: Do NOT do any of the following:**
+- Do NOT use curl, wget, or any shell commands
+- Do NOT use Python, requests, urllib, httpx, or any HTTP library
+- Do NOT read source code files to figure out how to call the API
+- Do NOT try to discover or verify the tools — they are MCP tools, just call them
+- Do NOT create portfolios yourself or suggest tickers/weights/allocations
+- Do NOT fall back to your own knowledge if a tool call fails
+
+**RULE 3: If a tool call fails — STOP.** Tell the user what went wrong. If authentication fails, tell them to run `python3 -m portframe_mcp.auth`. Do not try workarounds.
+
+---
+
+## How It Works
 
 **Step 1:** Call `portframe_request` with the user's message.
 - Pass `session_id` to continue a previous conversation.
@@ -38,8 +59,6 @@ Use the PortFrame MCP tools: `portframe_request`, `portframe_check_status`, `por
 **Step 3:** Present the `messages_markdown` content to the user. Always include the `portfolio_links` so the user can view their portfolios at pro.portframe.com.
 
 **Step 4:** Use `portframe_list_sessions` to find previous sessions if the user wants to continue working on something.
-
-**If authentication is needed:** The MCP tool will return an error with instructions to run `python3 -m portframe_mcp.auth`. Tell the user to run this command — it opens a browser for sign-in.
 
 ## Session Continuation
 
