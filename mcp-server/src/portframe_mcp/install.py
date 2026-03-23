@@ -8,8 +8,6 @@ overwriting other MCP servers.
 Run: python -m portframe_mcp.install
 """
 import json
-import os
-import platform
 import shutil
 import subprocess
 import sys
@@ -32,8 +30,8 @@ def _mcp_server_entry(use_uvx: bool) -> dict:
     if use_uvx:
         return {"command": "uvx", "args": ["portframe-mcp"]}
 
-    python_cmd = "python" if platform.system() == "Windows" else "python3"
-    return {"command": python_cmd, "args": ["-m", "portframe_mcp"]}
+    python_path = sys.executable
+    return {"command": python_path, "args": ["-m", "portframe_mcp"]}
 
 
 def _merge_mcp_config(config_path: Path, root_key: str, server_entry: dict) -> bool:
@@ -79,14 +77,13 @@ def _setup_claude_code(server_entry: dict, use_uvx: bool) -> bool:
                     "uvx", "portframe-mcp",
                 ]
             else:
-                python_cmd = "python" if platform.system() == "Windows" else "python3"
                 cmd = [
                     "claude", "mcp", "add",
                     "--transport", "stdio",
                     "--scope", "user",
                     "portframe",
                     "--",
-                    python_cmd, "-m", "portframe_mcp",
+                    sys.executable, "-m", "portframe_mcp",
                 ]
             subprocess.run(cmd, capture_output=True, timeout=10)
             log("  Configured via: claude mcp add")
@@ -139,8 +136,7 @@ def install() -> None:
     if use_uvx:
         log(f"uvx found: will use 'uvx portframe-mcp'")
     else:
-        python_cmd = "python" if platform.system() == "Windows" else "python3"
-        log(f"uvx not found: will use '{python_cmd} -m portframe_mcp'")
+        log(f"uvx not found: will use '{sys.executable} -m portframe_mcp'")
     log()
 
     server_entry = _mcp_server_entry(use_uvx)
