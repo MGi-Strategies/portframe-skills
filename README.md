@@ -18,27 +18,27 @@ Paste one command in your terminal. Pick your editor:
 
 **Claude Code** (Mac / Linux)
 ```bash
-git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && cp -r /tmp/pf-skills/skills/portframe ~/.claude/skills/portframe && rm -rf /tmp/pf-skills
+rm -rf /tmp/pf-skills ~/.claude/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && cp -r /tmp/pf-skills/skills/portframe ~/.claude/skills/portframe && rm -rf /tmp/pf-skills
 ```
 
 **Cursor** (Mac / Linux)
 ```bash
-git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.agents/skills && cp -r /tmp/pf-skills/skills/portframe ~/.agents/skills/portframe && rm -rf /tmp/pf-skills
+rm -rf /tmp/pf-skills ~/.cursor/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.cursor/skills && cp -r /tmp/pf-skills/skills/portframe ~/.cursor/skills/portframe && rm -rf /tmp/pf-skills
 ```
 
 **Cursor** (Windows PowerShell)
 ```powershell
-git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agents\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.agents\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
+Remove-Item -Recurse -Force "$env:USERPROFILE\.cursor\skills\portframe" -ErrorAction SilentlyContinue; git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cursor\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.cursor\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
 ```
 
 **Windsurf** (Mac / Linux)
 ```bash
-git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.agents/skills && cp -r /tmp/pf-skills/skills/portframe ~/.agents/skills/portframe && rm -rf /tmp/pf-skills
+rm -rf /tmp/pf-skills ~/.windsurf/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.windsurf/skills && cp -r /tmp/pf-skills/skills/portframe ~/.windsurf/skills/portframe && rm -rf /tmp/pf-skills
 ```
 
 **Windsurf** (Windows PowerShell)
 ```powershell
-git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agents\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.agents\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
+Remove-Item -Recurse -Force "$env:USERPROFILE\.windsurf\skills\portframe" -ErrorAction SilentlyContinue; git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.windsurf\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.windsurf\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
 ```
 
 > Cursor and Windsurf also load skills from `~/.claude/skills/`, so the Claude Code command works for all three.
