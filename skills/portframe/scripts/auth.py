@@ -11,6 +11,8 @@ No external dependencies required - uses Python stdlib only.
 import http.server
 import json
 import os
+import platform
+import subprocess
 import sys
 import threading
 import urllib.parse
@@ -73,6 +75,31 @@ def write_sessions_file(data):
     SESSIONS_FILE.write_text(json.dumps(data, indent=2))
 
 
+def open_browser(url: str) -> bool:
+    system = platform.system()
+    try:
+        if system == "Darwin":
+            subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            return True
+        elif system == "Windows":
+            os.startfile(url)
+            return True
+        elif system == "Linux":
+            for cmd in ["xdg-open", "sensible-browser", "x-www-browser"]:
+                try:
+                    subprocess.Popen([cmd, url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    return True
+                except FileNotFoundError:
+                    continue
+    except Exception:
+        pass
+    try:
+        webbrowser.open(url)
+        return True
+    except Exception:
+        return False
+
+
 def authenticate():
     global received_token
 
@@ -110,7 +137,9 @@ def authenticate():
     print(f"Waiting for authentication callback on port {CALLBACK_PORT}...")
     print()
 
-    webbrowser.open(signup_url)
+    if not open_browser(signup_url):
+        print("  Could not open browser automatically.")
+        print("  Please open the URL above manually.")
 
     server_should_stop.wait(timeout=300)
     server.shutdown()

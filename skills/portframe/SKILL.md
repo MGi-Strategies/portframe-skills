@@ -24,10 +24,10 @@ Read `~/.portframe/sessions.json` and look for the `api_token` field.
 
 **If no token exists, authenticate:**
 
-Run the authentication script to open a browser and generate a token:
+Run the authentication script to open a browser and generate a token. The script is located in the `scripts/` directory next to this SKILL.md file:
 
 ```bash
-python3 ${CLAUDE_SKILL_DIR}/scripts/auth.py
+python3 scripts/auth.py
 ```
 
 After authentication completes, the token will be saved to `~/.portframe/sessions.json`.
