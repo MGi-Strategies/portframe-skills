@@ -16,16 +16,23 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 
 **Requires:** Python 3.10+
 
-### Cursor / Windsurf / VS Code (MCP server)
+### Cursor / Windsurf / VS Code
 
+**Mac / Linux**
 ```bash
 git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
 
-This installs the MCP server and auto-configures it for any detected IDEs. Run this from inside your project directory so the project-level config gets written too.
+**Windows (PowerShell)**
+```powershell
+git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; python -m pip install $env:TEMP\pf-skills\mcp-server; python -m portframe_mcp.install; Remove-Item -Recurse -Force $env:TEMP\pf-skills
+```
+
+Run this from inside your project directory so the project-level config gets written too.
 
 ### Claude Code
 
+**Mac / Linux**
 ```bash
 git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
