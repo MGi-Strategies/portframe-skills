@@ -13,8 +13,7 @@ logger = logging.getLogger("portframe-mcp")
 
 mcp = FastMCP(
     "portframe",
-    version="1.0.0",
-    description="PortFrame AI — create, backtest, and analyze investment portfolios",
+    instructions="PortFrame AI — create, backtest, and analyze investment portfolios",
 )
 
 AUTH_ERROR = (
