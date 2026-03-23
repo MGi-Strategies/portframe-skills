@@ -45,12 +45,29 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.windsurf\skills\portframe" -Error
 >
 > These editors also load skills from `~/.claude/skills/`, so the Claude Code command works for all three.
 
+## Cursor Network Setup
+
+Cursor sandboxes terminal commands and blocks network access by default. You need to allow PortFrame's API domain. Create this file in your workspace:
+
+**`.cursor/sandbox.json`**
+```json
+{
+  "networkPolicy": {
+    "default": "deny",
+    "allow": ["ai-portframe.ngrok.app", "pro.portframe.com"]
+  }
+}
+```
+
+Then restart Cursor and start a new chat session.
+
 ## Getting Started
 
 1. Install using one of the commands above
-2. Open your editor and ask your AI assistant to create a portfolio
-3. On first use, a browser window will open for you to sign in to PortFrame
-4. That's it — your token is saved locally and you're ready to go
+2. **Cursor users:** Add the `sandbox.json` file above to your workspace
+3. Open your editor and ask your AI assistant to create a portfolio
+4. On first use, a browser window will open for you to sign in to PortFrame
+5. That's it — your token is saved locally and you're ready to go
 
 ## License
 
