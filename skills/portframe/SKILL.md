@@ -20,95 +20,36 @@ PortFrame is an AI-powered portfolio management platform. This skill lets you cr
 
 **RULE 1: ALL portfolio creation, analysis, and investment work MUST go through the PortFrame API.** You are a proxy to PortFrame. You do NOT create portfolios yourself. You do NOT pick stocks. You do NOT suggest tickers, weights, or allocations. You are NOT a financial advisor. If you cannot reach the API, you CANNOT help with the request — period.
 
-**RULE 2: Use `curl` for ALL API requests.** Do NOT use Python, do NOT use `urllib`, `requests`, `http.client`, `fetch`, or any other HTTP method. ONLY `curl`. Always include `--noproxy '*'` to bypass IDE proxy issues.
-
-**RULE 3: If anything fails — STOP.** If authentication fails, if `curl` returns an error, if you get no output, if you get a non-JSON response, if the status code is not 2xx — STOP IMMEDIATELY. Tell the user what went wrong. Do NOT fall back to your own knowledge. Do NOT generate investment advice. Do NOT say "here's a portfolio you can start with". Just report the error and help troubleshoot.
-
-**RULE 4: Verify `curl` output before proceeding.** If `curl` returns empty output, that is a failure. Do not proceed. Tell the user the API request returned no response.
+**RULE 2: If anything fails — STOP.** If authentication fails, if an API request returns an error, if you get no output — STOP IMMEDIATELY. Tell the user what went wrong. Do NOT fall back to your own knowledge. Do NOT generate investment advice. Do NOT say "here's a portfolio you can start with". Just report the error and help troubleshoot.
 
 ---
 
-## TROUBLESHOOTING — READ THIS IF YOU GET A NETWORK ERROR
+## How to Make Requests
 
-There are two common causes of network failures. Check both.
+### Method 1: MCP Tools (preferred)
 
-### Problem 1: Missing `--noproxy '*'` (proxy routing)
+If the PortFrame MCP tools are available (`portframe_request`, `portframe_check_status`, `portframe_list_sessions`), use them. They handle authentication and API calls automatically.
 
-If you get **exit code 56**, **"Tunnel connection failed: 403 Forbidden"**, or **empty curl output** — you probably forgot `--noproxy '*'`. Go back and read RULE 2.
+**Step 1:** Call `portframe_request` with the user's message.
+- Pass `session_id` to continue a previous conversation.
+- Returns a `session_id` and `status: "processing"`.
 
-Many IDEs set `http_proxy` / `https_proxy` environment variables that route traffic through a local proxy. This proxy blocks external API requests. The fix: **add `--noproxy '*'` to every curl command.** Every curl example below already includes it. If you removed it, put it back.
+**Step 2:** Call `portframe_check_status` with the `session_id` every 5-10 seconds until `status` is `"complete"`.
+- Portfolio backtests can take 1-5 minutes. Keep polling. Do not give up early.
 
-**Correct:**
-```bash
-curl --noproxy '*' -s -X POST https://ai-portframe.ngrok.app/api/v1/skill/request ...
-```
+**Step 3:** Present the `messages_markdown` content to the user. Always include the `portfolio_links` so the user can view their portfolios at pro.portframe.com.
 
-**Wrong (will fail in most IDEs):**
-```bash
-curl -s -X POST https://ai-portframe.ngrok.app/api/v1/skill/request ...
-```
+**Step 4:** Use `portframe_list_sessions` to find previous sessions if the user wants to continue working on something.
 
-### Problem 2: IDE sandbox blocking network entirely (DNS/socket failure)
+**If authentication is needed:** The MCP tool will return an error with instructions to run `python3 -m portframe_mcp.auth`. Tell the user to run this command — it opens a browser for sign-in.
 
-If you get **"Could not resolve host"** (exit code 6), **"Operation not permitted"**, or DNS/network errors even WITH `--noproxy '*'` — the IDE's sandbox is blocking all outbound network at the OS level. This is a separate issue from the proxy.
+### Method 2: curl (fallback)
 
-**Cursor** sandboxes all terminal commands by default using seccomp (Linux) / Seatbelt (macOS), which blocks DNS resolution and socket connections entirely. `--noproxy '*'` alone cannot fix this.
+If MCP tools are NOT available, use `curl` with `--noproxy '*'` for all API requests.
 
-**Tell the user** they need to do ONE of the following:
+**Authentication:** Read `~/.portframe/sessions.json` for the `api_token`. If none exists, run `python3 scripts/auth.py`.
 
-**Option A (recommended):** Create a file at `<workspace>/.cursor/sandbox.json` with:
-```json
-{
-  "networkPolicy": {
-    "default": "deny",
-    "allow": ["ai-portframe.ngrok.app", "pro.portframe.com"]
-  }
-}
-```
-
-**Option B:** In Cursor, go to **Settings > Agents > Auto-Run** and change to **"Ask Every Time"**. This lets the user approve each command to run outside the sandbox.
-
-**Option C:** Set the sandbox to allow all network:
-```json
-{
-  "networkPolicy": {
-    "default": "allow"
-  }
-}
-```
-
-After changing sandbox settings, the user should **restart Cursor** and start a new chat session.
-
-Do NOT try workarounds like "fallback shell subagent paths", Python HTTP libraries, or retry loops. Fix the sandbox config and re-run the curl command as instructed.
-
----
-
-## Step 1: Authentication
-
-Before making any API requests, you must have a valid API token.
-
-**Check for existing token:**
-
-Read `~/.portframe/sessions.json` and look for the `api_token` field.
-
-**If no token exists, authenticate:**
-
-Run the authentication script. It starts a local server and tries to open a browser:
-
-```bash
-python3 scripts/auth.py
-```
-
-The script will print a URL to the terminal. **Tell the user to open this URL in their browser if it doesn't open automatically.** The URL looks like: `https://pro.portframe.com/skill-signup?callback=...`
-
-After the user signs in, the token will be saved to `~/.portframe/sessions.json`.
-
-If the script fails or the user cannot complete sign-in — STOP. Do not proceed without a token.
-
-## Step 2: Submit a Request
-
-Send the user's request to the PortFrame AI agent. Use this exact format:
-
+**Submit a request:**
 ```bash
 curl --noproxy '*' -s -X POST https://ai-portframe.ngrok.app/api/v1/skill/request \
   -H "Authorization: Bearer API_TOKEN" \
@@ -116,58 +57,19 @@ curl --noproxy '*' -s -X POST https://ai-portframe.ngrok.app/api/v1/skill/reques
   -d '{"message": "USER_REQUEST_HERE"}'
 ```
 
-Replace `API_TOKEN` with the token from `~/.portframe/sessions.json`. Replace `USER_REQUEST_HERE` with the user's actual request.
-
-To continue an existing session, add `"session_id": "EXISTING_SESSION_ID"` to the JSON body.
-
-**Expected response:** JSON with `session_id` and `status: "processing"`. If you get anything else — STOP and report the error.
-
-## Step 3: Poll for Results
-
-Poll every 5 seconds until `status` is `"complete"`:
-
+**Poll for results** (every 5 seconds until `status` is `"complete"`):
 ```bash
 curl --noproxy '*' -s https://ai-portframe.ngrok.app/api/v1/skill/session/SESSION_ID \
   -H "Authorization: Bearer API_TOKEN"
 ```
 
-**Important:** Portfolio backtests can take 1-5 minutes. Keep polling. Do not give up early.
-
-**Expected response:** JSON with `status`, `messages_markdown`, and `portfolio_links`. If you get empty output or an error — STOP and tell the user.
-
-## Step 4: Present Results
-
-The response contains:
-- `status`: `"complete"`, `"processing"`, or `"error"`
-- `messages_markdown`: Full session results in markdown format including all tool calls and responses
-- `portfolio_links`: URLs to view created portfolios in the PortFrame Pro web app
-
-Present the `messages_markdown` content to the user. Always include the portfolio links so the user can view their portfolios at pro.portframe.com.
-
-## Step 5: Save Session Context
-
-After receiving results, update `~/.portframe/sessions.json` with the session metadata for future reference:
-
-```json
-{
-  "api_token": "pf_sk_...",
-  "sessions": [
-    {
-      "session_id": "the-session-id",
-      "created_at": "2026-03-22T...",
-      "description": "Brief description of what was created",
-      "portfolio_ids": ["id1", "id2"],
-      "last_accessed": "2026-03-22T..."
-    }
-  ]
-}
-```
+**Important:** Use ONLY `curl`. Do NOT use Python `urllib`, `requests`, `http.client`, `fetch`, or any other HTTP method. Always include `--noproxy '*'` to bypass IDE proxy issues.
 
 ## Session Continuation
 
 When the user wants to continue working on a previous portfolio or follow up on a session:
-- Check `~/.portframe/sessions.json` for recent sessions
-- Include the `session_id` in the request body to continue that conversation
+- Use `portframe_list_sessions` (MCP) or check `~/.portframe/sessions.json` (curl) for recent sessions
+- Include the `session_id` when making a new request to continue that conversation
 - The PortFrame agent retains full context from the previous session
 
 **Create a NEW session** (omit session_id) when:
@@ -256,19 +158,14 @@ After presenting portfolio results, suggest these follow-up actions to the user:
 ## Error Handling
 
 If the API returns an error:
-- **401 Unauthorized**: The token is invalid. Delete `~/.portframe/sessions.json` and re-run `scripts/auth.py`.
+- **401 Unauthorized**: The token is invalid. Run `python3 -m portframe_mcp.auth` to re-authenticate.
 - **404 Not Found**: The session ID doesn't exist or belongs to a different user. Start a new session.
 - **400 Bad Request**: The request is missing required fields. Ensure `message` is included.
 - **500 Server Error**: An internal error occurred. Wait a moment and try again.
 - **status: "error"** in session response: Show the error details to the user and suggest trying again.
-- **Empty curl output**: Network/proxy issue. Tell the user.
-
-## API Base URL
-
-All requests go to: `https://ai-portframe.ngrok.app`
 
 ## Notes
 
-- Responses are in English by default. Add `"language": "zh"` or other language codes to the request body to get responses in other languages.
+- Responses are in English by default. Add `"language": "zh"` or other language codes to get responses in other languages.
 - The PortFrame agent uses emojis in its responses - this is normal and part of the experience.
 - Portfolio links open in the PortFrame Pro web app at pro.portframe.com where users can see full interactive dashboards.

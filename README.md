@@ -14,7 +14,19 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 
 ## Install
 
-Paste one command in your terminal. Pick your editor:
+**Requires:** Python 3.10+
+
+### Option 1: pip install (recommended)
+
+```bash
+pip install portframe-mcp && python -m portframe_mcp.install
+```
+
+This installs the MCP server and auto-configures it for any detected IDEs (Cursor, Claude Code, Windsurf, VS Code).
+
+### Option 2: Manual skill install (no MCP)
+
+If you prefer the skill-only approach (uses curl instead of MCP):
 
 **Claude Code** (Mac / Linux)
 ```bash
@@ -23,34 +35,27 @@ rm -rf /tmp/pf-skills ~/.claude/skills/portframe && git clone https://github.com
 
 **Cursor** (Mac / Linux)
 ```bash
-rm -rf /tmp/pf-skills ~/.cursor/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.cursor/skills && cp -r /tmp/pf-skills/skills/portframe ~/.cursor/skills/portframe && python3 /tmp/pf-skills/scripts/setup-cursor-sandbox.py && rm -rf /tmp/pf-skills
+rm -rf /tmp/pf-skills ~/.cursor/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.cursor/skills && cp -r /tmp/pf-skills/skills/portframe ~/.cursor/skills/portframe && rm -rf /tmp/pf-skills
 ```
 
-**Cursor** (Windows PowerShell)
-```powershell
-Remove-Item -Recurse -Force "$env:USERPROFILE\.cursor\skills\portframe" -ErrorAction SilentlyContinue; git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.cursor\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.cursor\skills\portframe"; python "$env:TEMP\pf-skills\scripts\setup-cursor-sandbox.py"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
-```
-
-**Windsurf** (Mac / Linux)
-```bash
-rm -rf /tmp/pf-skills ~/.windsurf/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && mkdir -p ~/.windsurf/skills && cp -r /tmp/pf-skills/skills/portframe ~/.windsurf/skills/portframe && rm -rf /tmp/pf-skills
-```
-
-**Windsurf** (Windows PowerShell)
-```powershell
-Remove-Item -Recurse -Force "$env:USERPROFILE\.windsurf\skills\portframe" -ErrorAction SilentlyContinue; git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.windsurf\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.windsurf\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
-```
-
-> **Cursor / Windsurf:** Start a new chat session after installing for the skill to be discovered.
->
-> These editors also load skills from `~/.claude/skills/`, so the Claude Code command works for all three.
+> **Note:** The skill-only install uses curl for API calls, which may be blocked by Cursor's sandbox. The MCP install (Option 1) avoids this issue entirely.
 
 ## Getting Started
 
-1. Install using one of the commands above
-2. Open your editor and ask your AI assistant to create a portfolio
-3. On first use, a browser window will open for you to sign in to PortFrame
-4. That's it — your token is saved locally and you're ready to go
+1. Install using one of the methods above
+2. Restart your IDE and start a new chat session
+3. Ask your AI assistant to create a portfolio
+4. On first use, you'll be prompted to sign in to PortFrame
+5. That's it — your token is saved locally and you're ready to go
+
+## How It Works
+
+The MCP server provides 3 tools to your AI assistant:
+- **portframe_request** — Submit portfolio requests to PortFrame AI
+- **portframe_check_status** — Poll for results (backtests can take 1-5 minutes)
+- **portframe_list_sessions** — Continue previous conversations
+
+The MCP server runs outside the IDE sandbox, so it works reliably in Cursor, Claude Code, and other editors without network configuration issues.
 
 ## License
 
