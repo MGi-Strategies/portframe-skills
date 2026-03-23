@@ -43,7 +43,20 @@ That's it. Call the tool NOW. Everything below is reference material for after y
 - Do NOT create portfolios yourself or suggest tickers/weights/allocations
 - Do NOT fall back to your own knowledge if a tool call fails
 
-**RULE 3: If a tool call fails — STOP.** Tell the user what went wrong. If authentication fails, tell them to run `python3 -m portframe_mcp.auth`. Do not try workarounds.
+**RULE 3: If authentication fails — show the signup link.**
+If `portframe_request` returns an error about no API token or authentication failure, present THIS link directly in the chat so the user can click it:
+
+**https://pro.portframe.com/skill-signup?callback=http%3A//localhost%3A8023/callback**
+
+Tell the user:
+1. First run `python3 -m portframe_mcp.auth` in a terminal (outside the IDE) to start the callback server
+2. Then click or open the link above in their browser
+3. Complete sign-in — the token saves automatically
+4. Come back and say "ready" to retry
+
+Do NOT just tell the user to run the auth command and hope the browser opens. The browser often cannot open from inside an IDE. Always show the full URL in the chat.
+
+**RULE 4: If any other tool call fails — STOP.** Tell the user what went wrong. Do not try workarounds.
 
 ---
 

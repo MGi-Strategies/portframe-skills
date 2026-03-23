@@ -11,10 +11,7 @@ from portframe_mcp.config import API_BASE_URL, load_token, load_sessions, save_s
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("portframe-mcp")
 
-mcp = FastMCP(
-    "portframe",
-    instructions="PortFrame AI — create, backtest, and analyze investment portfolios",
-)
+mcp = FastMCP("portframe")
 
 AUTH_ERROR = (
     "No PortFrame API token found. "
