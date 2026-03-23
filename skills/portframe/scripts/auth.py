@@ -28,6 +28,10 @@ received_token = None
 server_should_stop = threading.Event()
 
 
+def log(msg=""):
+    print(msg, flush=True)
+
+
 class CallbackHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         global received_token
@@ -79,8 +83,9 @@ def open_browser(url: str) -> bool:
     system = platform.system()
     try:
         if system == "Darwin":
-            subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            return True
+            result = subprocess.run(["open", url], capture_output=True, timeout=5)
+            if result.returncode == 0:
+                return True
         elif system == "Windows":
             os.startfile(url)
             return True
@@ -106,17 +111,17 @@ def authenticate():
     sessions_data = read_sessions_file()
     if sessions_data.get("api_token"):
         token = sessions_data["api_token"]
-        print(f"Already authenticated. Token prefix: {token[:12]}...")
-        print(f"Token file: {SESSIONS_FILE}")
-        print()
-        print("To re-authenticate, delete the token from ~/.portframe/sessions.json and run this script again.")
+        log(f"Already authenticated. Token prefix: {token[:12]}...")
+        log(f"Token file: {SESSIONS_FILE}")
+        log()
+        log("To re-authenticate, delete the token from ~/.portframe/sessions.json and run this script again.")
         return token
 
     try:
         server = http.server.HTTPServer(("localhost", CALLBACK_PORT), CallbackHandler)
     except OSError as e:
-        print(f"Error: Could not start server on port {CALLBACK_PORT}: {e}")
-        print(f"Is another process using port {CALLBACK_PORT}?")
+        log(f"Error: Could not start server on port {CALLBACK_PORT}: {e}")
+        log(f"Is another process using port {CALLBACK_PORT}?")
         sys.exit(1)
 
     server_thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -125,41 +130,47 @@ def authenticate():
     callback_url = f"http://localhost:{CALLBACK_PORT}/callback"
     signup_url = f"{SIGNUP_URL}?callback={urllib.parse.quote(callback_url)}"
 
-    print("=" * 60)
-    print("  PortFrame Skill Authentication")
-    print("=" * 60)
-    print()
-    print("Opening your browser to sign in to PortFrame...")
-    print()
-    print(f"If your browser doesn't open automatically, visit:")
-    print(f"  {signup_url}")
-    print()
-    print(f"Waiting for authentication callback on port {CALLBACK_PORT}...")
-    print()
+    log("=" * 60)
+    log("  PortFrame Skill Authentication")
+    log("=" * 60)
+    log()
+    log(f"Server listening on port {CALLBACK_PORT}...")
+    log()
 
-    if not open_browser(signup_url):
-        print("  Could not open browser automatically.")
-        print("  Please open the URL above manually.")
+    browser_opened = open_browser(signup_url)
+
+    if browser_opened:
+        log("Browser opened. Complete sign-in to continue.")
+    else:
+        log("Could not open browser automatically.")
+
+    log()
+    log("If the browser didn't open, copy and paste this URL:")
+    log()
+    log(f"  {signup_url}")
+    log()
+    log("Waiting for callback (5 min timeout)...")
+    log()
 
     server_should_stop.wait(timeout=300)
     server.shutdown()
 
     if not received_token:
-        print("Authentication timed out after 5 minutes.")
-        print("Please try again.")
+        log("Authentication timed out after 5 minutes.")
+        log("Please try again.")
         sys.exit(1)
 
     sessions_data["api_token"] = received_token
     write_sessions_file(sessions_data)
 
-    print("=" * 60)
-    print("  Authentication Successful!")
-    print("=" * 60)
-    print()
-    print(f"Token prefix: {received_token[:12]}...")
-    print(f"Token saved to: {SESSIONS_FILE}")
-    print()
-    print("You can now use PortFrame through your AI agent.")
+    log("=" * 60)
+    log("  Authentication Successful!")
+    log("=" * 60)
+    log()
+    log(f"Token prefix: {received_token[:12]}...")
+    log(f"Token saved to: {SESSIONS_FILE}")
+    log()
+    log("You can now use PortFrame through your AI agent.")
     return received_token
 
 
