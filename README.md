@@ -16,14 +16,25 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 
 **Requires:** Python 3.10+
 
-### Option 1: Install from source
+### Cursor / Windsurf / VS Code (MCP server)
 
 ```bash
 git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
 
-This installs the MCP server and auto-configures it for any detected IDEs (Cursor, Claude Code, Windsurf, VS Code).
+This installs the MCP server and auto-configures it for any detected IDEs. Run this from inside your project directory so the project-level config gets written too.
 
+### Claude Code
+
+```bash
+git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
+```
+
+The installer auto-detects Claude Code and registers the MCP server via `claude mcp add`. You can also install the skill directly:
+
+```bash
+rm -rf /tmp/pf-skills ~/.claude/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && cp -r /tmp/pf-skills/skills/portframe ~/.claude/skills/portframe && rm -rf /tmp/pf-skills
+```
 
 ## Getting Started
 
