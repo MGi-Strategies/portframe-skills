@@ -41,7 +41,9 @@ rm -rf /tmp/pf-skills ~/.windsurf/skills/portframe && git clone https://github.c
 Remove-Item -Recurse -Force "$env:USERPROFILE\.windsurf\skills\portframe" -ErrorAction SilentlyContinue; git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.windsurf\skills" | Out-Null; Copy-Item -Recurse "$env:TEMP\pf-skills\skills\portframe" "$env:USERPROFILE\.windsurf\skills\portframe"; Remove-Item -Recurse -Force "$env:TEMP\pf-skills"
 ```
 
-> Cursor and Windsurf also load skills from `~/.claude/skills/`, so the Claude Code command works for all three.
+> **Cursor / Windsurf:** Start a new chat session after installing for the skill to be discovered.
+>
+> These editors also load skills from `~/.claude/skills/`, so the Claude Code command works for all three.
 
 ## Getting Started
 
