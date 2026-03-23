@@ -26,9 +26,7 @@ PortFrame is an AI-powered portfolio management platform. This skill lets you cr
 
 ## How to Make Requests
 
-### Method 1: MCP Tools (preferred)
-
-If the PortFrame MCP tools are available (`portframe_request`, `portframe_check_status`, `portframe_list_sessions`), use them. They handle authentication and API calls automatically.
+Use the PortFrame MCP tools: `portframe_request`, `portframe_check_status`, `portframe_list_sessions`. Do NOT use curl, do NOT use any HTTP libraries, do NOT make API calls yourself.
 
 **Step 1:** Call `portframe_request` with the user's message.
 - Pass `session_id` to continue a previous conversation.
@@ -43,32 +41,10 @@ If the PortFrame MCP tools are available (`portframe_request`, `portframe_check_
 
 **If authentication is needed:** The MCP tool will return an error with instructions to run `python3 -m portframe_mcp.auth`. Tell the user to run this command — it opens a browser for sign-in.
 
-### Method 2: curl (fallback)
-
-If MCP tools are NOT available, use `curl` with `--noproxy '*'` for all API requests.
-
-**Authentication:** Read `~/.portframe/sessions.json` for the `api_token`. If none exists, run `python3 scripts/auth.py`.
-
-**Submit a request:**
-```bash
-curl --noproxy '*' -s -X POST https://ai-portframe.ngrok.app/api/v1/skill/request \
-  -H "Authorization: Bearer API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"message": "USER_REQUEST_HERE"}'
-```
-
-**Poll for results** (every 5 seconds until `status` is `"complete"`):
-```bash
-curl --noproxy '*' -s https://ai-portframe.ngrok.app/api/v1/skill/session/SESSION_ID \
-  -H "Authorization: Bearer API_TOKEN"
-```
-
-**Important:** Use ONLY `curl`. Do NOT use Python `urllib`, `requests`, `http.client`, `fetch`, or any other HTTP method. Always include `--noproxy '*'` to bypass IDE proxy issues.
-
 ## Session Continuation
 
 When the user wants to continue working on a previous portfolio or follow up on a session:
-- Use `portframe_list_sessions` (MCP) or check `~/.portframe/sessions.json` (curl) for recent sessions
+- Use `portframe_list_sessions` to find recent sessions
 - Include the `session_id` when making a new request to continue that conversation
 - The PortFrame agent retains full context from the previous session
 
