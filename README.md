@@ -2,6 +2,16 @@
 
 Give your AI coding assistant the power to create, backtest, and analyze investment portfolios — just by asking.
 
+**Mac / Linux**
+```bash
+curl -fsSL https://pro.portframe.com/skills/install | bash
+```
+
+**Windows (PowerShell)**
+```powershell
+git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; python -m pip install $env:TEMP\pf-skills\mcp-server; python -m portframe_mcp.install; Remove-Item -Recurse -Force $env:TEMP\pf-skills
+```
+
 ## What Can It Do?
 
 - "Build me a portfolio focused on AI companies"
@@ -14,30 +24,31 @@ Give your AI coding assistant the power to create, backtest, and analyze investm
 
 ## Install
 
-**Requires:** Python 3.10+
+**Requires:** Python 3.10+, git
 
-### Cursor / Windsurf / VS Code
+### Quick Install (Mac / Linux)
 
-**Mac / Linux**
 ```bash
-git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
+curl -fsSL https://pro.portframe.com/skills/install | bash
 ```
 
-**Windows (PowerShell)**
+Auto-detects and configures Cursor, Claude Code, Windsurf, and VS Code.
+
+### Windows (PowerShell)
+
 ```powershell
 git clone https://github.com/MGi-Strategies/portframe-skills.git $env:TEMP\pf-skills; python -m pip install $env:TEMP\pf-skills\mcp-server; python -m portframe_mcp.install; Remove-Item -Recurse -Force $env:TEMP\pf-skills
 ```
 
-Run this from inside your project directory so the project-level config gets written too.
+### Manual Install (Mac / Linux)
 
-### Claude Code
-
-**Mac / Linux**
 ```bash
 git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && python3 -m pip install /tmp/pf-skills/mcp-server && python3 -m portframe_mcp.install && rm -rf /tmp/pf-skills
 ```
 
-The installer auto-detects Claude Code and registers the MCP server via `claude mcp add`. You can also install the skill directly:
+Run from inside your project directory so the project-level config gets written too.
+
+For Claude Code, you can also install the skill directly:
 
 ```bash
 rm -rf /tmp/pf-skills ~/.claude/skills/portframe && git clone https://github.com/MGi-Strategies/portframe-skills.git /tmp/pf-skills && cp -r /tmp/pf-skills/skills/portframe ~/.claude/skills/portframe && rm -rf /tmp/pf-skills

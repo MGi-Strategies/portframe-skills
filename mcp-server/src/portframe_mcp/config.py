@@ -3,7 +3,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-API_BASE_URL = "https://ai-portframe.ngrok.app"
+API_BASE_URL = "https://ai.portframe.com"
 SESSIONS_FILE = Path.home() / ".portframe" / "sessions.json"
 
 

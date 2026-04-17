@@ -7,7 +7,7 @@ without overwriting other settings. Creates the file if it doesn't exist.
 import json
 import os
 
-DOMAINS = ["ai-portframe.ngrok.app", "pro.portframe.com"]
+DOMAINS = ["ai.portframe.com", "pro.portframe.com"]
 SANDBOX_PATH = os.path.expanduser("~/.cursor/sandbox.json")
 
 
